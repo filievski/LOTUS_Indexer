@@ -19,14 +19,13 @@ rl.on('line', function(line){
 	     function (error, triple, prefixes) {
 		if (!error){
 			if (triple && N3Util.isLiteral(triple.object)){
+//				esjson=JSON.stringify({"object": {"lang": N3Util.getLiteralLanguage(triple.object), "lexform": N3Util.getLiteralValue(triple.object), "dtype": N3Util.getLiteralType(triple.object)}, "subject": triple.subject, "predicate": triple.predicate, "graph": triple.graph});
+//				console.log(esjson);
 				request({ url: "http://localhost:9200/lodl/data", method: 'POST', json: {"object": {"lang": N3Util.getLiteralLanguage(triple.object), "lexform": N3Util.getLiteralValue(triple.object), "dtype": N3Util.getLiteralType(triple.object)}, "subject": triple.subject, "predicate": triple.predicate, "graph": triple.graph}}, function(error, request, body){
 					if (error)
 						console.log("Insertion error: " + error);
 				});
 			}
-		}
-		 else {
-			console.log("Parsing triple error: " + line + " " + error);
 		}
 	});
 });
