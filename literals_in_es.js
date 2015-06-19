@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-var N3 = require('n3');
-var N3Util = N3.Util;
-var parser = N3.Parser();
 var request = require('request');
+var uuid = require('node-uuid');
+var trim = require('trim');
+//var fs = require('fs');
 
 // Readline interface for reading statements line by line
 var readline = require('readline');
@@ -13,18 +13,28 @@ var rl = readline.createInterface({
   terminal: false
 });
 
+var N3 = require('n3');
+var N3Util = N3.Util;
+//var parser = N3.Parser();
+//rdfStream = process.stdin;
+//rdfStream.pipe(parser);
+//streamParser.pipe(new SlowConsumer());
+
 // Read line by line, parse triple/quad with N3 and store it in elasticsearch
 rl.on('line', function(line){
-	parser.parse(line,
-	     function (error, triple, prefixes) {
-		if (!error){
-			if (triple && N3Util.isLiteral(triple.object)){
+	N3.Parser().parse(line,	
+	function (error, triple, prefixes) {
+		if (triple && N3Util.isLiteral(triple.object)){
 //				esjson=JSON.stringify({"object": {"lang": N3Util.getLiteralLanguage(triple.object), "lexform": N3Util.getLiteralValue(triple.object), "dtype": N3Util.getLiteralType(triple.object)}, "subject": triple.subject, "predicate": triple.predicate, "graph": triple.graph});
-//				console.log(esjson);
-				request({ url: "http://localhost:9200/lodl/data", method: 'POST', json: {"object": {"lang": N3Util.getLiteralLanguage(triple.object), "lexform": N3Util.getLiteralValue(triple.object), "dtype": N3Util.getLiteralType(triple.object)}, "subject": triple.subject, "predicate": triple.predicate, "graph": triple.graph}}, function(error, request, body){
-					if (error)
-						console.log("Insertion error: " + error);
-				});
+			request({ url: "http://localhost:9200/lodlit/data/" + uuid.v4(), method: 'PUT', json: {"obj": {"lang": N3Util.getLiteralLanguage(triple.object), "lexform": N3Util.getLiteralValue(triple.object), "dtype": N3Util.getLiteralType(triple.object)}, "subject": triple.subject, "predicate": triple.predicate, "graph": triple.graph}}, function(error, request, body){
+				if (error)
+					console.log("Insertion error: " + error);
+			});
+		
+		}
+		else {
+			if (error){
+				console.log(error);
 			}
 		}
 	});
