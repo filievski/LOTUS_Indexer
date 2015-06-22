@@ -23,19 +23,19 @@ var elasticsearch = require('es'),
 var  byline = require('byline');
 var stream = byline.createStream(process.stdin);
 var c=0, docs=[];
-var bulksize = 5;
+var bulksize = 10000;
 
 var options = {
-  _index : 'ltest',
-  _type : 'data'
+  _index : 'litlod',
+  _type : 'lodl'
 }
 
 parser.parse(stream, function(){
 	if (arguments['1']) {
 		var doc = arguments['1'];
-		oldobject=doc['object'];
-		doc['object']={"lang": N3Util.getLiteralLanguage(oldobject), "lexform": N3Util.getLiteralValue(oldobject), "dtype": N3Util.getLiteralType(oldobject)};
-		docs.push(doc);
+		var docobj=doc["object"];
+		var newdoc={"graph": doc["graph"], "subject": doc["subject"], "predicate": doc["predicate"], "lexform": N3Util.getLiteralValue(docobj), "lang": N3Util.getLiteralLanguage(docobj), "dtype": N3Util.getLiteralType(docobj)};
+		docs.push(newdoc);
 		if (++c>=bulksize){
 			c=0;
 			es.bulkIndex(options, docs, function (err, data) {
