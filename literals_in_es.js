@@ -20,44 +20,64 @@ var N3Util = N3.Util;
 var parser = N3.Parser();
 var elasticsearch = require('es'),
   es = elasticsearch();
+var zpad = require('zpad');
 var  byline = require('byline');
 var stream = byline.createStream(process.stdin);
-var c=0, docs=[];
-var bulksize = 10000;
+var docs=[];
+var bulksize = 40000;
 
 var options = {
-  _index : 'litlod',
-  _type : 'lodl'
+  _index : 'lodspot',
+  _type : 'lodtype'
 }
 
+var regex = /^[-\.,0-9]*$/;
+
+var c=0;
+var s=0;
+var nums=0;
+//console.time("dbsave");
 parser.parse(stream, function(){
 	if (arguments['1']) {
 		var doc = arguments['1'];
 		var docobj=doc["object"];
-		var newdoc={"graph": doc["graph"], "subject": doc["subject"], "predicate": doc["predicate"], "lexform": N3Util.getLiteralValue(docobj), "lang": N3Util.getLiteralLanguage(docobj), "dtype": N3Util.getLiteralType(docobj)};
+		var litvalue=N3Util.getLiteralValue(docobj);
+		if (litvalue.match(regex))
+			nums++;	
+		var newdoc={"_id": zpad(c, 15), "graph": doc["graph"], "subject": doc["subject"], "predicate": doc["predicate"], "lexform": litvalue, "lang": N3Util.getLiteralLanguage(docobj), "dtype": N3Util.getLiteralType(docobj)};
 		docs.push(newdoc);
-		if (++c>=bulksize){
-			c=0;
-			es.bulkIndex(options, docs, function (err, data) {
-				docs=[];
+		if (c==2000000){
+			console.log("Numbers amount: ", nums)
+			process.exit();
+		}
+		if ((++c) % bulksize==0){
+			console.log(c);
+			temp=docs;
+			docs=[];
+//			stream.pause();
+			console.time("st");
+			es.bulkIndex(options, temp, function (err, data) {
 				if (!err){
-					console.log("Stored");
+					console.timeEnd("st");
+					//if((++s)*bulksize >= 1000000){console.timeEnd("dbsave"); process.exit();}
 				} else {
-					console.log("Error while bulk inserting");
+					console.log("Error while bulk inserting" + err);
+					process.exit(1);
 				}
+//				stream.resume();
 			});
 		} 
-	} else{
+	} /* else{
 		es.bulkIndex(options, docs, function (err, data) {
 			docs=[];
 			if (!err){
-				console.log("Stored");
+				console.log("Stored", c);
 			} else {
-				console.log("Error while bulk inserting");
+				console.log("Error while bulk inserting" + err);
+				process.exit(1);
 			}
 		});
-	}
-
+	} */
 });
 /*
 var rdfStream = rl;
