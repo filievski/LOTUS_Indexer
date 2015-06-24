@@ -1,9 +1,8 @@
 #! /bin/bash
 
-curl -X DELETE http://localhost:9200/lodspot
+curl -X DELETE 130.37.193.118:9200/lodspot
 
-
-curl -X PUT http://localhost:9200/lodspot -d '{
+curl -X PUT 130.37.193.118:9200/lodspot -d '{
 "settings": {
     "index" : {
         "merge": {
@@ -12,7 +11,6 @@ curl -X PUT http://localhost:9200/lodspot -d '{
 	    }
 	},
 	"number_of_replicas" : 0,
-	"number_of_shards" : 1,
         "refresh_interval": -1,
 	"translog": {
 	    "flush_threshold_size": "2000mb"
