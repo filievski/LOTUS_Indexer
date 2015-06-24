@@ -6,8 +6,7 @@ var parser = N3.Parser();
 var elasticsearch = require('es'),
   es = elasticsearch();
 var fs = require('fs');
-var zpad = require('zpad');
-var  byline = require('byline');
+var byline = require('byline');
 var stream = byline.createStream(process.stdin);
 var docs=[];
 var bulksize = 40000;
@@ -54,7 +53,7 @@ parser.parse(stream, function(){
 		if (litvalue.match(regex))
 			nums++;	
 		else {
-			var newdoc={"_id": zpad(c, 15), "graph": doc["graph"], "subject": doc["subject"], "predicate": doc["predicate"], "lexform": litvalue, "lang": N3Util.getLiteralLanguage(docobj), "dtype": N3Util.getLiteralType(docobj)};
+			var newdoc={"graph": doc["graph"], "subject": doc["subject"], "predicate": doc["predicate"], "lexform": litvalue, "lang": N3Util.getLiteralLanguage(docobj), "dtype": N3Util.getLiteralType(docobj)};
 			docs.push(newdoc);
 			if ((++c) % bulksize==0){
 				s++;
