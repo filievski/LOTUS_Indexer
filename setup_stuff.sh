@@ -10,6 +10,7 @@ curl -X PUT 130.37.193.118:9200/lodspot -d '{
 		"max_thread_count": 1
 	    }
 	},
+	"number_of_shards": 3,
 	"number_of_replicas" : 0,
         "refresh_interval": -1,
 	"translog": {
@@ -52,10 +53,3 @@ curl -X PUT 130.37.193.118:9200/lodspot -d '{
 rm logs.txt
 echo -e "Stored\tRead\tNumbers\n" > logs.txt
 
-while read -r downloadLink; do
-        echo $downloadLink
-        curl -q -o - $downloadLink | zcat | grep '"' | nodejs --max-old-space-size=8192 literals_in_es.js
-#	exit;
-	#curl -q -o - $downloadLink | zcat > /dev/null        
-#	echo "done"
-done < <( ./Frank/frank documents --downloadUri )

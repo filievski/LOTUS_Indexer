@@ -8,7 +8,7 @@ var fs = require('fs');
 var byline = require('byline');
 var stream = byline.createStream(process.stdin);
 var docs=[];
-var bulksize = 35000;
+var bulksize = 75000;
 
 var config = {
   // optional - when not supplied, defaults to the following:
