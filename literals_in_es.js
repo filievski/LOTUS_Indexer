@@ -3,13 +3,22 @@
 var N3 = require('n3');
 var N3Util = N3.Util;
 var parser = N3.Parser();
-var elasticsearch = require('es'),
-  es = elasticsearch();
+var elasticsearch = require('es');
 var fs = require('fs');
 var byline = require('byline');
 var stream = byline.createStream(process.stdin);
 var docs=[];
-var bulksize = 40000;
+var bulksize = 35000;
+
+var config = {
+  // optional - when not supplied, defaults to the following:
+  server : {
+    host : '130.37.193.118',
+    port : 9200
+  }
+};
+
+es = elasticsearch(config);
 
 var options = {
   _index : 'lodspot',
