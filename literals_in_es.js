@@ -8,12 +8,12 @@ var fs = require('fs');
 var byline = require('byline');
 var stream = byline.createStream(process.stdin);
 var docs=[];
-var bulksize = 75000;
+var bulksize = 50000;
 
 var config = {
   // optional - when not supplied, defaults to the following:
   server : {
-    host : '130.37.193.118',
+    host : 'localhost',
     port : 9200
   }
 };

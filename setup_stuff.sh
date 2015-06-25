@@ -1,25 +1,30 @@
 #! /bin/bash
 
-curl -X DELETE 130.37.193.118:9200/lodspot
+curl -X DELETE http://localhost:9200/lodspot
 
-curl -X PUT 130.37.193.118:9200/lodspot -d '{
+curl -X PUT http://localhost:9200/lodspot -d '{
 "settings": {
+    "transient" : {
+        "indices.store.throttle.type" : "none" 
+    },
     "index" : {
-        "merge": {
+	"merge": {
 	    "scheduler": {
-		"max_thread_count": 1
+		"max_thread_count": 16
 	    }
 	},
-	"number_of_shards": 3,
 	"number_of_replicas" : 0,
         "refresh_interval": -1,
 	"translog": {
-	    "flush_threshold_size": "2000mb"
+	    "flush_threshold_size": "4000mb"
 	}
     }
     },
 "mappings": {
     "lodtype" : {
+	    "_all": {
+                "enabled":  false
+            },
       "properties" : {
         "graph" : {
           "type" :    "string",
