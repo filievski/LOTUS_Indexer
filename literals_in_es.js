@@ -21,8 +21,8 @@ var config = {
 es = elasticsearch(config);
 
 var options = {
-  _index : 'lodl',
-  _type : 'lodlindex',
+  _index : 'laundrospot',
+  _type : 'lst',
   refresh: false,
   timeout: 900000
 }
@@ -52,6 +52,11 @@ var logToFiles = function(r) {
 	});
 }
 
+var logMd5 = function() {
+	fs.appendFile('md5.txt', docid + "\n", function (err){
+	});
+}
+
 var logError = function(r) {
 	fs.appendFile('errors.txt', r, function (err){
 	});
@@ -60,6 +65,7 @@ var logError = function(r) {
 //stream.on('end', function(){
 //});
 
+docid=process.argv[2];
 
 parser.parse(stream, function(){
 	if (arguments['1']) {
@@ -69,7 +75,7 @@ parser.parse(stream, function(){
 		if (litvalue.match(regex))
 			nums++;	
 		else {
-			var newdoc={"graph": doc["graph"], "subject": doc["subject"], "predicate": doc["predicate"], "lexform": litvalue, "lang": N3Util.getLiteralLanguage(docobj), "dtype": N3Util.getLiteralType(docobj)};
+			var newdoc={"docid": docid, "subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": N3Util.getLiteralLanguage(docobj)};
 			docs.push(newdoc);
 			if ((++c) % bulksize==0){
 				s++;
@@ -81,6 +87,7 @@ parser.parse(stream, function(){
 		if (remaining){
 			processBulk(function(){
 				logToFiles(remaining);
+				logMd5();
 			});
 		}
 
