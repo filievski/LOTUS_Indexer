@@ -21,8 +21,10 @@ var config = {
 es = elasticsearch(config);
 
 var options = {
-  _index : 'lodspot',
-  _type : 'lodtype'
+  _index : 'lodl',
+  _type : 'lodlindex',
+  refresh: false,
+  timeout: 900000
 }
 
 var regex = /^[-\.,0-9]*$/;
@@ -39,14 +41,19 @@ var processBulk = function(callback) {
 			if (callback)
 				callback();
 		} else {
-			console.log("Error while bulk inserting" + err);
-			process.exit(1);
+			logError("Error while bulk indexing: " + err + "\n");
+//			process.exit(1);
 		}
 	});
 }
 
 var logToFiles = function(r) {
 	fs.appendFile('logs.txt', (s*bulksize+r).toString() + "\t" + c.toString() + "\t" + nums.toString() + "\n", function (err){
+	});
+}
+
+var logError = function(r) {
+	fs.appendFile('errors.txt', r, function (err){
 	});
 }
 

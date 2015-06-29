@@ -1,13 +1,13 @@
 #! /bin/bash
 
-curl -X DELETE http://localhost:9200/lodspot
+curl -X DELETE http://localhost:9200/lodl
 
-curl -X PUT http://localhost:9200/lodspot -d '{
+curl -X PUT http://localhost:9200/lodl -d '{
 "settings": {
     "transient" : {
         "indices.store.throttle.type" : "none" 
     },
-    "index" : {
+    "bulk" : {
 	"merge": {
 	    "scheduler": {
 		"max_thread_count": 16
@@ -18,10 +18,22 @@ curl -X PUT http://localhost:9200/lodspot -d '{
 	"translog": {
 	    "flush_threshold_size": "4000mb"
 	}
+    },
+    "index" : {
+        "merge": {
+            "scheduler": {
+                "max_thread_count": 16
+            }
+        },
+        "number_of_replicas" : 0,
+        "refresh_interval": -1,
+        "translog": {
+            "flush_threshold_size": "4000mb"
+        }
     }
     },
 "mappings": {
-    "lodtype" : {
+    "lodlindex" : {
 	    "_all": {
                 "enabled":  false
             },
