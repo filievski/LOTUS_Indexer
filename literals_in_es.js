@@ -13,7 +13,7 @@ var bulksize = 50000;
 var config = {
   // optional - when not supplied, defaults to the following:
   server : {
-    host : 'localhost',
+    host : 'fii800.lxc',
     port : 9200
   }
 };
