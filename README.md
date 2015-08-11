@@ -9,3 +9,5 @@
  4.4. Edit the config file for some general bulk settings (some may overlap with the index creation settings)
 5. Run indexer
 6. Increase nr. replicas to 1, refresh interval to default
+7. Setup incrementality
+8. Setup URI rooting
