@@ -62,8 +62,6 @@ var logError = function(r) {
 	});
 }
 
-//stream.on('end', function(){
-//});
 
 docid=process.argv[2];
 

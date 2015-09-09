@@ -7,5 +7,7 @@
  4.2. export MAX_OPEN_FILES="41000" (Increase the maximum amount of open files in the file system)
  4.3. Index settings (see & run file create_index.sh)
  4.4. Edit the config file for some general bulk settings (some may overlap with the index creation settings)
-5. Run indexer
-6. Increase nr. replicas to 1, refresh interval to default
+5. Make sure nodejs is installed, as well as all needed modules
+6. Clone Frank inside the LOTUS Indexer repository
+7. Run indexer
+8. Increase nr. replicas to 1, refresh interval to default
