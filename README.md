@@ -11,3 +11,7 @@
 6. Increase nr. replicas to 1, refresh interval to default
 7. Setup incrementality
 8. Setup URI rooting
+
+
+
+Info: On 9/9/2015, LOTUS contained 5,319,878,204 (5,32B), weighing in total 485.5 GB.
