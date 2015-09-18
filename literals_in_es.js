@@ -73,7 +73,7 @@ parser.parse(stream, function(){
 		if (litvalue.match(regex))
 			nums++;	
 		else {
-			var newdoc={"docid": docid, "subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": N3Util.getLiteralLanguage(docobj)};
+			var newdoc={"docid": docid, "subject": doc["subject"], "kbase": url.parse(doc["subject"]).hostname, "predicate": doc["predicate"], "string": litvalue, "langtag": N3Util.getLiteralLanguage(docobj)};
 			docs.push(newdoc);
 			if ((++c) % bulksize==0){
 				s++;

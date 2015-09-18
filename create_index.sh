@@ -13,6 +13,9 @@ curl -X PUT http://localhost:9200/laundrospot -d '{
         "refresh_interval": -1,
         "translog": {
             "flush_threshold_size": "4000mb"
+        },
+        "query": {
+            "default_field":"string"
         }
     },
     "index" : {
@@ -25,20 +28,31 @@ curl -X PUT http://localhost:9200/laundrospot -d '{
         "refresh_interval": -1,
         "translog": {
             "flush_threshold_size": "4000mb"
-        }
+        },
+	"query": {
+	    "default_field":"string"
+	}
     }
     },
 "mappings": {
     "lst" : {
-            "_all": {
-                "enabled":  false
-            },
+                "_all": {
+                    "enabled":  false
+            },{
+	        "_source": {
+		    "enabled": false
+	      }
+	    },
       "properties" : {
         "docid" : {
           "type" :    "string",
           "index":    "not_analyzed"      
         },
        "subject" : {
+          "type" :    "string",
+          "index":    "not_analyzed"      
+        },
+       "kbase" : {
           "type" :    "string",
           "index":    "not_analyzed"      
         },
