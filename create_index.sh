@@ -1,4 +1,4 @@
-curl -X PUT http://localhost:9200/laundrospot -d '{
+curl -X PUT http://localhost:9200/lotus -d '{
 "settings": {
     "transient" : {
         "indices.store.throttle.type" : "none" 
@@ -35,14 +35,10 @@ curl -X PUT http://localhost:9200/laundrospot -d '{
     }
     },
 "mappings": {
-    "lst" : {
+    "lit" : {
                 "_all": {
                     "enabled":  false
-            },{
-	        "_source": {
-		    "enabled": false
-	      }
-	    },
+            },
       "properties" : {
         "docid" : {
           "type" :    "string",
@@ -67,6 +63,10 @@ curl -X PUT http://localhost:9200/laundrospot -d '{
        "langtag" : {
           "type" :    "string",
           "index":    "analyzed"      
+        },
+       "ald" : {
+          "type" :    "string",
+          "index":    "not_analyzed"      
         }
         }
       }

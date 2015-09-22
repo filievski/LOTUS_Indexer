@@ -6,6 +6,8 @@ var parser = N3.Parser();
 var elasticsearch = require('es');
 var fs = require('fs');
 var byline = require('byline');
+var cld=require('cld');
+var url=require('url');
 var stream = byline.createStream(process.stdin);
 var docs=[];
 var bulksize = 50000;
@@ -21,8 +23,8 @@ var config = {
 es = elasticsearch(config);
 
 var options = {
-  _index : 'laundrospot',
-  _type : 'lst',
+  _index : 'lotus',
+  _type : 'lit',
   refresh: false,
   timeout: 900000
 }
@@ -73,12 +75,19 @@ parser.parse(stream, function(){
 		if (litvalue.match(regex))
 			nums++;	
 		else {
-			var newdoc={"docid": docid, "subject": doc["subject"], "kbase": url.parse(doc["subject"]).hostname, "predicate": doc["predicate"], "string": litvalue, "langtag": N3Util.getLiteralLanguage(docobj)};
-			docs.push(newdoc);
-			if ((++c) % bulksize==0){
-				s++;
-				processBulk(null);
-			} 
+			cld.detect(N3Util.getLiteralValue(docobj), function(err, result) {
+				var newdoc={};
+				if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
+					newdoc={"docid": docid, "subject": doc["subject"], "kbase": url.parse(doc["subject"]).hostname, "predicate": doc["predicate"], "string": litvalue, "langtag": N3Util.getLiteralLanguage(docobj), "ald": result["languages"]["0"]["code"]};
+				} else{
+					newdoc={"docid": docid, "subject": doc["subject"], "kbase": url.parse(doc["subject"]).hostname, "predicate": doc["predicate"], "string": litvalue, "langtag": N3Util.getLiteralLanguage(docobj)};
+				}
+				docs.push(newdoc);
+				if ((++c) % bulksize==0){
+					s++;
+					processBulk(null);
+				}
+			}); 
 		}
 	} else {
 		var remaining=docs.length;
