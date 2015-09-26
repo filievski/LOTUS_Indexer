@@ -38,37 +38,46 @@ curl -X PUT http://localhost:9200/lotus -d '{
     "lit" : {
                 "_all": {
                     "enabled":  false
-            },
-      "properties" : {
-        "docid" : {
-          "type" :    "string",
-          "index":    "not_analyzed"      
-        },
-       "subject" : {
-          "type" :    "string",
-          "index":    "not_analyzed"      
-        },
-       "kbase" : {
-          "type" :    "string",
-          "index":    "not_analyzed"      
-        },
-       "predicate" : {
-          "type" :    "string",
-          "index":    "not_analyzed"      
-        },
-       "string" : {
-          "type" :    "string",
-          "index":    "analyzed"      
-        },
-       "langtag" : {
-          "type" :    "string",
-          "index":    "analyzed"      
-        },
-       "ald" : {
-          "type" :    "string",
-          "index":    "not_analyzed"      
-        }
-        }
-      }
-    }
-  }'
+            	},
+	      "properties" : {
+			"docid" : {
+			  "type" :    "string",
+			  "index":    "not_analyzed"      
+			},
+		       "string" : {
+			  "type" :    "string",
+			  "index":    "analyzed"      
+			},
+                       "subjterms" : {
+                          "type" :    "string",
+                          "index":    "analyzed"      
+                        },
+                       "predterms" : {
+                          "type" :    "string",
+                          "index":    "analyzed"      
+                        },
+		       "langtag" : {
+			  "type" :    "string",
+			  "index":    "not_analyzed"      
+			},
+			"triple" : {
+				"type": "object",
+				"properties" : {
+					"subject" : {
+						"type" :    "string",
+						"index":    "not_analyzed"      
+					},
+				       "predicate" : {
+						"type" :    "string",
+						"index":    "not_analyzed"      
+					},
+					"object" : {
+						"type" :    "string",
+						"index":    "not_analyzed"      
+					}
+				}
+      			}
+    		}
+  	}
+}
+}'

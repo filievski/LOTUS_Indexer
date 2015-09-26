@@ -6,7 +6,7 @@ fi
 while read -r downloadLink; do
   #      echo $downloadLink
 	docid=${downloadLink##*/}
-        curl -q -o - $downloadLink | zcat | grep '"' | nodejs literals_in_es.js $docid
+        curl -q -o - $downloadLink | zcat | grep '"' | nodejs separate_fields_es.js $docid
 	#curl -q -o - $downloadLink | zcat > /dev/null        
 #	echo "done"
 done < <( ./Frank/frank documents --downloadUri | grep -E "http://download\.lodlaundromat\.org/[$searchFor]" )

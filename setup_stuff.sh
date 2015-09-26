@@ -1,5 +1,6 @@
 #! /bin/bash
 
+curl -X DELETE http://localhost:9200/laundrospot
 curl -X DELETE http://localhost:9200/lotus
 
 #export ES_HEAP_SIZE="16096M"
