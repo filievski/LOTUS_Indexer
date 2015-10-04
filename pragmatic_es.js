@@ -94,7 +94,7 @@ parser.parse(stream, function(){
 				string += uriToString(subject);
 			}
 			if (langtag==""){
-				cld.detect(N3Util.getLiteralValue(docobj), function(err, result) {
+				cld.detect(N3Util.getLiteralValue(litvalue), function(err, result) {
 					var newdoc={};
 					if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
 						newdoc={"docid": docid, "triple": doc, "string": string, "langtag": result["languages"]["0"]["code"]};
