@@ -64,30 +64,57 @@ var logError = function(r) {
 	});
 }
 
+var uriToString = function(s){
+	var u = url.parse(s);
+	var toReturn = ' ';
+	if (u.hostname)
+		toReturn += u.hostname.replace(/\./g, ' ') + " ";
+	if (u.pathname)
+		toReturn += u.pathname.replace(/\//g, ' ') + ' ';
+	if (u.hash)
+		toReturn += u.hash.replace(/#/, "") + ' ';
+	return toReturn;
+}
 
 docid=process.argv[2];
 
 parser.parse(stream, function(){
 	if (arguments['1']) {
 		var doc = arguments['1'];
+		delete doc["graph"];
 		var docobj=doc["object"];
 		var litvalue=N3Util.getLiteralValue(docobj);
 		if (litvalue.match(regex))
 			nums++;	
 		else {
-			cld.detect(N3Util.getLiteralValue(docobj), function(err, result) {
-				var newdoc={};
-				if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
-					newdoc={"docid": docid, "subject": doc["subject"], "kbase": url.parse(doc["subject"]).hostname, "predicate": doc["predicate"], "string": litvalue, "langtag": N3Util.getLiteralLanguage(docobj), "ald": result["languages"]["0"]["code"]};
-				} else{
-					newdoc={"docid": docid, "subject": doc["subject"], "kbase": url.parse(doc["subject"]).hostname, "predicate": doc["predicate"], "string": litvalue, "langtag": N3Util.getLiteralLanguage(docobj)};
-				}
+			var subject=doc["subject"];
+			var langtag=N3Util.getLiteralLanguage(docobj);
+			var string=litvalue + uriToString(doc["predicate"]);
+			if (subject.lastIndexOf("http://lodlaundromat.org/.well-known/genid/", 0)==-1){ // skip blank nodes
+				string += uriToString(subject);
+			}
+			if (langtag==""){
+				cld.detect(N3Util.getLiteralValue(litvalue), function(err, result) {
+					var newdoc={};
+					if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
+						newdoc={"docid": docid, "triple": doc, "string": string, "langtag": result["languages"]["0"]["code"]};
+					} else{
+						newdoc={"docid": docid, "triple": doc, "string": string};
+					}
+					docs.push(newdoc);
+					if ((++c) % bulksize==0){
+						s++;
+						processBulk(null);
+					}
+				});
+			} else{
+				var newdoc={"docid": docid, "triple": doc, "string": string, "langtag": langtag.substring(0,2).toLowerCase()};
 				docs.push(newdoc);
 				if ((++c) % bulksize==0){
 					s++;
 					processBulk(null);
 				}
-			}); 
+			}
 		}
 	} else {
 		var remaining=docs.length;

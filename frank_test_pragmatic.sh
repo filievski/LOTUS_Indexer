@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#./setup_stuff.sh
+./setup_stuff.sh
 
 ./frank_documents_new.sh abcd &
 ./frank_documents_new.sh ef01 &

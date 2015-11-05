@@ -1,12 +1,10 @@
 #! /bin/bash
 searchFor="$1"
 if [ -z $1 ]; then
-	searchFor="."
+        searchFor="."
 fi
 while read -r downloadLink; do
   #      echo $downloadLink
-	docid=${downloadLink##*/}
-        curl -q -o - $downloadLink | zcat | grep '"' | nodejs separate_fields_es.js $docid
-	#curl -q -o - $downloadLink | zcat > /dev/null        
-#	echo "done"
+        docid=${downloadLink##*/}
+        curl -q -o - $downloadLink | zcat | grep '"' | nodejs catalogue.js $searchFor
 done < <( ./Frank/frank documents --downloadUri | grep -E "http://download\.lodlaundromat\.org/[$searchFor]" )
