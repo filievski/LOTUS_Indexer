@@ -72,7 +72,6 @@ var logError = function(r) {
 }
 
 var uriToString = function(s){
-	console.log(s.replace(/\W+/g, " ").replace("http ", "").replace("www ", ""));
 	return s.replace(/\W+/g, " ").replace("http ", "").replace("www ", "");
 }
 
@@ -87,19 +86,18 @@ parser.parse(stream, function(){
 		if (litvalue.match(regex))
 			nums++;	
 		else {
-			var subject=doc["subject"];
 			var langtag=N3Util.getLiteralLanguage(docobj);
-			var string=litvalue + uriToString(doc["predicate"]);
-			if (subject.lastIndexOf("http://lodlaundromat.org/.well-known/genid/", 0)==-1){ // skip blank nodes
-				string += uriToString(subject);
-			}
+			var pred =  uriToString(doc["predicate"]);
+			//if (subject.lastIndexOf("http://lodlaundromat.org/.well-known/genid/", 0)==-1){ // skip blank nodes
+			var sub = uriToString(doc["subject"]);
+			//}
 			if (langtag==""){
 				cld.detect(litvalue, function(err, result) {
 					var newdoc={};
 					if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
-						newdoc={"docid": docid, "triple": doc, "string": string, "langtag": result["languages"]["0"]["code"].substring(0,2).toLowerCase()};
+						newdoc={"docid": docid, "triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": result["languages"]["0"]["code"].substring(0,2).toLowerCase()};
 					} else{
-						newdoc={"docid": docid, "triple": doc, "string": string, "langtag": "any"};
+						newdoc={"docid": docid, "triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": "any"};
 					}
 					docs.push(newdoc);
 					if ((++c) % bulksize==0){
@@ -108,7 +106,7 @@ parser.parse(stream, function(){
 					}
 				});
 			} else{
-				var newdoc={"docid": docid, "triple": doc, "string": string, "langtag": langtag.substring(0,2).toLowerCase()};
+				var newdoc={"docid": docid, "triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": langtag.substring(0,2).toLowerCase()};
 				docs.push(newdoc);
 				if ((++c) % bulksize==0){
 					s++;
