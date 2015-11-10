@@ -1,8 +1,6 @@
 #! /bin/bash
 
-curl -X DELETE http://localhost:9200/laundrospot
-curl -X DELETE http://localhost:9200/lotus
-
+curl -u $(cat .config) -X DELETE https://lotus.lucy.surfsara.nl/lotus
 #export ES_HEAP_SIZE="16096M"
 #export MAX_OPEN_FILES="41000"
 

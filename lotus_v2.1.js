@@ -11,12 +11,17 @@ var url=require('url');
 var stream = byline.createStream(process.stdin);
 var docs=[];
 var bulksize = 50000;
+var configurationFile = '.config';
+
+var contents = fs.readFileSync(configurationFile).toString();
 
 var config = {
   // optional - when not supplied, defaults to the following:
   server : {
-    host : 'fii800.lxc',
-    port : 9200
+    host : 'lotus.lucy.surfsara.nl',
+    port: 443,
+    auth: contents,
+    secure: true
   }
 };
 
@@ -94,7 +99,7 @@ parser.parse(stream, function(){
 				string += uriToString(subject);
 			}
 			if (langtag==""){
-				cld.detect(N3Util.getLiteralValue(litvalue), function(err, result) {
+				cld.detect(litvalue, function(err, result) {
 					var newdoc={};
 					if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
 						newdoc={"docid": docid, "triple": doc, "string": string, "langtag": result["languages"]["0"]["code"].substring(0,2).toLowerCase()};
@@ -123,7 +128,6 @@ parser.parse(stream, function(){
 				logToFiles(remaining);
 				logMd5();
 			});
-		}
-
+		} else logMd5();
 	}
 });

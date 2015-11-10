@@ -1,4 +1,4 @@
-curl -X PUT http://localhost:9200/lotus -d '{
+curl -u $(cat .config) -X PUT https://lotus.lucy.surfsara.nl/lotus -d '{
 "settings": {
     "transient" : {
         "indices.store.throttle.type" : "none" 
@@ -9,7 +9,8 @@ curl -X PUT http://localhost:9200/lotus -d '{
                 "max_thread_count": 16
             }
         },
-        "number_of_replicas" : 0,
+        "number_of_replicas" : 1,
+	"number_of_shards": 10,
         "refresh_interval": -1,
         "translog": {
             "flush_threshold_size": "4000mb"
@@ -24,7 +25,8 @@ curl -X PUT http://localhost:9200/lotus -d '{
                 "max_thread_count": 16
             }
         },
-        "number_of_replicas" : 0,
+        "number_of_replicas" : 1,
+	"number_of_shards": 10,
         "refresh_interval": -1,
         "translog": {
             "flush_threshold_size": "4000mb"
