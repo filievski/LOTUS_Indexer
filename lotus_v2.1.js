@@ -97,9 +97,9 @@ parser.parse(stream, function(){
 				cld.detect(N3Util.getLiteralValue(litvalue), function(err, result) {
 					var newdoc={};
 					if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
-						newdoc={"docid": docid, "triple": doc, "string": string, "langtag": result["languages"]["0"]["code"]};
+						newdoc={"docid": docid, "triple": doc, "string": string, "langtag": result["languages"]["0"]["code"].substring(0,2).toLowerCase()};
 					} else{
-						newdoc={"docid": docid, "triple": doc, "string": string};
+						newdoc={"docid": docid, "triple": doc, "string": string, "langtag": "any"};
 					}
 					docs.push(newdoc);
 					if ((++c) % bulksize==0){
