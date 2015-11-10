@@ -14,6 +14,6 @@
 
 
 
-**Info:**  
+**Info:**
   * On 9/9/2015, LOTUS v2.0 contained 5,319,878,204 (5,32B), weighing in total 485.5 GB.  
   * LOTUS v2.1 has size of 631GB.
