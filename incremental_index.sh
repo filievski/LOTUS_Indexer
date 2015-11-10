@@ -4,4 +4,4 @@ exit 0
 downloadLink=$1
 docid=${downloadLink##*/}
 currentDir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-curl -q -o - $downloadLink | zcat | grep '"' | nodejs $currentDir/lotus_v2.1.js $docid
+curl -q -o - $downloadLink | zcat | grep '"' | nodejs $currentDir/lotus_v1.2.js $docid
