@@ -27,7 +27,6 @@ var config = {
   }
 };
 
-
 es = elasticsearch(config);
 
 var options = {
@@ -73,15 +72,8 @@ var logError = function(r) {
 }
 
 var uriToString = function(s){
-	var u = url.parse(s);
-	var toReturn = ' ';
-	if (u.hostname)
-		toReturn += u.hostname.replace(/\./g, ' ') + " ";
-	if (u.pathname)
-		toReturn += u.pathname.replace(/\//g, ' ') + ' ';
-	if (u.hash)
-		toReturn += u.hash.replace(/#/, "") + ' ';
-	return toReturn;
+	console.log(s.replace(/\W+/g, " ").replace("http ", "").replace("www ", ""));
+	return s.replace(/\W+/g, " ").replace("http ", "").replace("www ", "");
 }
 
 docid=process.argv[2];
