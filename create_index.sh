@@ -48,15 +48,7 @@ curl -X PUT http://localhost:9200/lotus -d '{
 			  "type" :    "string",
 			  "index":    "analyzed"      
 			},
-                       "subjterms" : {
-                          "type" :    "string",
-                          "index":    "analyzed"      
-                        },
-                       "predterms" : {
-                          "type" :    "string",
-                          "index":    "analyzed"      
-                        },
-		       "langtag" : {
+                    	"langtag" : {
 			  "type" :    "string",
 			  "index":    "not_analyzed"      
 			},
@@ -65,15 +57,15 @@ curl -X PUT http://localhost:9200/lotus -d '{
 				"properties" : {
 					"subject" : {
 						"type" :    "string",
-						"index":    "not_analyzed"      
+						"index":    "no"      
 					},
 				       "predicate" : {
 						"type" :    "string",
-						"index":    "not_analyzed"      
+						"index":    "no"      
 					},
 					"object" : {
 						"type" :    "string",
-						"index":    "not_analyzed"      
+						"index":    "no"      
 					}
 				}
       			}
