@@ -1,4 +1,5 @@
-.config
+.password-file
+config.json
 frank
 node_modules/
 *.txt

@@ -11,16 +11,18 @@ var url=require('url');
 var stream = byline.createStream(process.stdin);
 var docs=[];
 var bulksize = 50000;
-var configurationFile = '.config';
+var configurationFile = 'config.json';
 
-var contents = fs.readFileSync(configurationFile).toString();
+var configuration = JSON.parse(
+    fs.readFileSync(configurationFile)
+);
 
 var config = {
   // optional - when not supplied, defaults to the following:
   server : {
     host : 'lotus.lucy.surfsara.nl',
     port: 443,
-    auth: contents,
+    auth: configuration.auth,
     secure: true
   }
 };

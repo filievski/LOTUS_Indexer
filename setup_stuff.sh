@@ -1,6 +1,6 @@
 #! /bin/bash
 
-curl -u $(cat .config) -X DELETE https://lotus.lucy.surfsara.nl/lotus
+curl -u lotus:$(cat .password-file) -X DELETE https://lotus.lucy.surfsara.nl/lotus
 #export ES_HEAP_SIZE="16096M"
 #export MAX_OPEN_FILES="41000"
 

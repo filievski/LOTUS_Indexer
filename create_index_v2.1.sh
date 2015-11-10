@@ -1,4 +1,4 @@
-curl -u $(cat .config) -X PUT https://lotus.lucy.surfsara.nl/lotus -d '{
+curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus -d '{
 "settings": {
     "transient" : {
         "indices.store.throttle.type" : "none" 
