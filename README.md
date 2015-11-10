@@ -1,3 +1,4 @@
+## Create LOTUS index
 
 1. Install Elastic Search & start it as a daemon: ./bin/elasticsearch -d
 2. Install Marvel monitoring tool (optional, recommended for monitoring). Start the instance.
