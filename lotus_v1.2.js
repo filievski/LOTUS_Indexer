@@ -12,6 +12,20 @@ var stream = byline.createStream(process.stdin);
 var docs=[];
 var bulksize = 50000;
 var configurationFile = 'config.json';
+var category = require('unicode-7.0.0/categories');
+
+var isNLS = function(s){
+        var consecutive=0
+	if (s.length<2) return false;
+        for (var i = 0, len=s.length; i<len; i++) {
+                if(category[ s.charCodeAt(i) ][0]=="L") {
+                        if (++consecutive==2) return true;
+                } else {
+                        consecutive=0;
+                }
+                if (i==len-1) return false;
+        }
+}
 
 var configuration = JSON.parse(
     fs.readFileSync(configurationFile)
@@ -46,7 +60,7 @@ var processBulk = function(callback) {
 	temp=docs;
 	docs=[];
 	es.bulkIndex(options, temp, function (err, data) {
-		if (!err){
+		if (!err || !err["errors"]){
 			if (callback)
 				callback();
 		} else {
@@ -72,7 +86,7 @@ var logError = function(r) {
 }
 
 var uriToString = function(s){
-	return s.replace(/\W+/g, " ").replace("http ", "").replace("www ", "");
+	return s.replace(/\W+/g, " ").replace("_", " ");
 }
 
 docid=process.argv[2];
@@ -83,9 +97,8 @@ parser.parse(stream, function(){
 		delete doc["graph"];
 		var docobj=doc["object"];
 		var litvalue=N3Util.getLiteralValue(docobj);
-		if (litvalue.match(regex))
-			nums++;	
-		else {
+		var datatype = N3Util.getLiteralType(docobj);
+		if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(litvalue)){
 			var langtag=N3Util.getLiteralLanguage(docobj);
 			var pred =  uriToString(doc["predicate"]);
 			//if (subject.lastIndexOf("http://lodlaundromat.org/.well-known/genid/", 0)==-1){ // skip blank nodes
@@ -113,7 +126,8 @@ parser.parse(stream, function(){
 					processBulk(null);
 				}
 			}
-		}
+		} else
+			nums++;
 	} else {
 		var remaining=docs.length;
 		if (remaining){
