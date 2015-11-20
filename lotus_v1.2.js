@@ -62,7 +62,7 @@ var logToFiles = function(r) {
 }
 
 var logMd5 = function() {
-	fs.appendFile('md5.txt', docid + "\n", function (err){
+	fs.appendFile('done.txt', docid + "\n", function (err){
 	});
 }
 
@@ -95,9 +95,9 @@ parser.parse(stream, function(){
 				cld.detect(litvalue, function(err, result) {
 					var newdoc={};
 					if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
-						newdoc={"docid": docid, "triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": result["languages"]["0"]["code"].substring(0,2).toLowerCase()};
+						newdoc={"triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": result["languages"]["0"]["code"].substring(0,2).toLowerCase()};
 					} else{
-						newdoc={"docid": docid, "triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": "any"};
+						newdoc={"triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": "any"};
 					}
 					docs.push(newdoc);
 					if ((++c) % bulksize==0){
@@ -106,7 +106,7 @@ parser.parse(stream, function(){
 					}
 				});
 			} else{
-				var newdoc={"docid": docid, "triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": langtag.substring(0,2).toLowerCase()};
+				var newdoc={"triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": langtag.substring(0,2).toLowerCase()};
 				docs.push(newdoc);
 				if ((++c) % bulksize==0){
 					s++;

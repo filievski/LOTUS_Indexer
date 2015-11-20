@@ -6,7 +6,7 @@ curl -u lotus:$(cat .password-file) -X DELETE https://lotus.lucy.surfsara.nl/lot
 
 ./create_index_v1.2.sh
 
-rm md5.txt
+rm done.txt
 rm errors.txt
 rm logs.txt
 echo -e "Stored\tRead\tNumbers\n" > logs.txt
