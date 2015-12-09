@@ -6,7 +6,6 @@ var parser = N3.Parser();
 var elasticsearch = require('es');
 var fs = require('fs');
 var byline = require('byline');
-var cld=require('cld');
 var url=require('url');
 var stream = byline.createStream(process.stdin);
 var docs=[];
@@ -14,11 +13,11 @@ var bulksize = 50000;
 var configurationFile = 'config.json';
 var category = require('unicode-7.0.0/categories');
 
-var isNLS = function(s){
+var isNLS = function(s1){
         var consecutive=0
-	if (s.length<2) return false;
-        for (var i = 0, len=s.length; i<len; i++) {
-                if(category[ s.charCodeAt(i) ][0]=="L") {
+	if (s1.length<2) return false;
+        for (var i = 0, len=s1.length; i<len; i++) {
+                if(category[ s1.charCodeAt(i) ][0]=="L") {
                         if (++consecutive==2) return true;
                 } else {
                         consecutive=0;
@@ -50,8 +49,6 @@ var options = {
   timeout: 900000
 }
 
-var regex = /^[-\.,0-9]*$/;
-
 var c=0;
 var s=0;
 var nums=0;
@@ -75,21 +72,14 @@ var logToFiles = function(r) {
 	});
 }
 
-var logMd5 = function() {
-	fs.appendFile('done.txt', docid + "\n", function (err){
-	});
-}
-
 var logError = function(r) {
 	fs.appendFile('errors.txt', r, function (err){
 	});
 }
 
-var uriToString = function(s){
-	return s.replace(/\W+/g, " ").replace("_", " ");
+var uriToString = function(s1){
+	return s1.replace(/\W+/g, " ");
 }
-
-docid=process.argv[2];
 
 parser.parse(stream, function(){
 	if (arguments['1']) {
@@ -104,27 +94,13 @@ parser.parse(stream, function(){
 			//if (subject.lastIndexOf("http://lodlaundromat.org/.well-known/genid/", 0)==-1){ // skip blank nodes
 			var sub = uriToString(doc["subject"]);
 			//}
-			if (langtag==""){
-				cld.detect(litvalue, function(err, result) {
-					var newdoc={};
-					if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
-						newdoc={"triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": result["languages"]["0"]["code"].substring(0,2).toLowerCase()};
-					} else{
-						newdoc={"triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": "any"};
-					}
-					docs.push(newdoc);
-					if ((++c) % bulksize==0){
-						s++;
-						processBulk(null);
-					}
-				});
-			} else{
-				var newdoc={"triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": langtag.substring(0,2).toLowerCase()};
-				docs.push(newdoc);
-				if ((++c) % bulksize==0){
-					s++;
-					processBulk(null);
-				}
+			if (langtag=="") langtag="any"; 
+			else langtag=langtag.substring(0,2).toLowerCase();
+			var newdoc={"triple": doc, "s": sub, "p": pred, "o": litvalue, "langtag": langtag};
+			docs.push(newdoc);
+			if ((++c) % bulksize==0){
+				s++;
+				processBulk(null);
 			}
 		} else
 			nums++;
@@ -133,8 +109,7 @@ parser.parse(stream, function(){
 		if (remaining){
 			processBulk(function(){
 				logToFiles(remaining);
-				logMd5();
 			});
-		} else logMd5();
+		}
 	}
 });
