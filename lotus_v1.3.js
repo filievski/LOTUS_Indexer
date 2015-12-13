@@ -54,7 +54,7 @@ var c=0;
 var s=0;
 var nums=0;
 
-var timex=process.argv[2];
+var timex=+ process.argv[2];
 
 var processBulk = function(callback) {
 	temp=docs;
@@ -84,6 +84,13 @@ var uriToString = function(s1){
 	return s1.replace(/\W+/g, " ");
 }
 
+
+var newdoc={};
+var previous='';
+var prevSize=0;
+var pendingRequests=0;
+var finished=false;
+var blankNodePrefix="http://lodlaundromat.org/.well-known/genid/";
 parser.parse(stream, function(){
 	if (arguments['1']) {
 		var doc = arguments['1'];
@@ -92,33 +99,61 @@ parser.parse(stream, function(){
 		var datatype = N3Util.getLiteralType(docobj);
 		if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(litvalue)){
 			var langtag=N3Util.getLiteralLanguage(docobj);
-			//if (subject.lastIndexOf("http://lodlaundromat.org/.well-known/genid/", 0)==-1){ // skip blank nodes
-			//}
 			if (langtag=="") langtag="any"; 
 			else langtag=langtag.substring(0,2).toLowerCase();
-                        request('http://index.lodlaundromat.org/r2d?limit=0&uri=' + doc['subject'], function (error, response, body) {
-				var r2d=0;
-                                if (!error && response.statusCode == 200) {
-					r2d=body.length;
-                                } 
-
-				var newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": r2d};
-
-				docs.push(newdoc);
-				if ((++c) % bulksize==0){
-					s++;
-					processBulk(null);
-				}
-                       })
+			if (doc['subject']==previous){
+				newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": prevSize};
+                                docs.push(newdoc);
+                                if ((++c) % bulksize==0){
+                                        s++;
+                                        processBulk(null);
+                                }
+			} else if (doc['subject'].startsWith(blankNodePrefix)){
+				prevSize=1;
+				previous=doc['subject'];
+				newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": 1};
+                                docs.push(newdoc);
+                                if ((++c) % bulksize==0){
+                                        s++;
+                                        processBulk(null);
+                                }
+			} else {
+				pendingRequests++;
+				request('http://index.lodlaundromat.org/r2d/' + encodeURIComponent(doc['subject']) + '?size', function (error, response, body) {
+					var r2d=0;
+					if (!error && response.statusCode == 200) {
+						r2d=JSON.parse(body).size;
+						previous=doc["subject"];
+						prevSize=r2d;
+						var newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": r2d};
+						docs.push(newdoc);
+						pendingRequests--;
+						if ((++c) % bulksize==0){
+							s++;
+							processBulk(null);
+						} else {
+							if (pendingRequests==0 && finished){
+								processBulk(function(){
+									logToFiles(remaining);
+								});
+							}
+						}
+					} else
+						logError(doc['subject'] + '\n');
+			       })
+			}
 
 		} else
 			nums++;
 	} else {
-		var remaining=docs.length;
-		if (remaining){
-			processBulk(function(){
-				logToFiles(remaining);
-			});
+		finished=true;
+		if (pendingRequests==0){
+			var remaining=docs.length;
+			if (remaining){
+				processBulk(function(){
+					logToFiles(remaining);
+				});
+			}
 		}
 	}
 });

@@ -34,11 +34,11 @@ curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus 
 	      "properties" : {
 		        "subject" : {
 			  "type" :    "string",
-			  "index":    "analyzed"      
+			  "index":    "no"      
 			},
                         "predicate" : {
                           "type" :    "string",
-                          "index":    "analyzed"      
+                          "index":    "no"      
                         },
                         "string" : {
                           "type" :    "string",
@@ -50,7 +50,10 @@ curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus 
 			},
 			"timestamp" : {
 				"type": "integer"
-      			}
+      			},
+			"r2d": {
+				"type": "integer"
+			}
     		}
   	}
 }
