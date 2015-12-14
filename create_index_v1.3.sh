@@ -53,6 +53,9 @@ curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus 
       			},
 			"r2d": {
 				"type": "integer"
+			},
+			"length": {
+				"type": "float"
 			}
     		}
   	}

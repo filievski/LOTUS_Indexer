@@ -1,5 +1,8 @@
 #! /bin/bash
 
+ps aux | grep lotus_run_v1.[3]_ | awk '{ print $2 }' | xargs kill -s 9
+ps aux | grep nodejs | awk '{ print $2 }' | xargs kill -s 9
+
 curl -u lotus:$(cat .password-file) -X DELETE https://lotus.lucy.surfsara.nl/lotus
 #export ES_HEAP_SIZE="16096M"
 #export MAX_OPEN_FILES="41000"

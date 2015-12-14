@@ -102,16 +102,16 @@ parser.parse(stream, function(){
 			if (langtag=="") langtag="any"; 
 			else langtag=langtag.substring(0,2).toLowerCase();
 			if (doc['subject']==previous){
-				newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": prevSize};
+				newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": prevSize, "length": 1.0/litvalue.length };
                                 docs.push(newdoc);
                                 if ((++c) % bulksize==0){
                                         s++;
                                         processBulk(null);
                                 }
-			} else if (doc['subject'].startsWith(blankNodePrefix)){
+			} else if (doc['subject'].indexOf(blankNodePrefix)>=0){
 				prevSize=1;
 				previous=doc['subject'];
-				newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": 1};
+				newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": 1, "length": 1.0/litvalue.length };
                                 docs.push(newdoc);
                                 if ((++c) % bulksize==0){
                                         s++;
@@ -119,13 +119,13 @@ parser.parse(stream, function(){
                                 }
 			} else {
 				pendingRequests++;
-				request('http://index.lodlaundromat.org/r2d/' + encodeURIComponent(doc['subject']) + '?size', function (error, response, body) {
+				request('http://localhost:7007/r2d/' + encodeURIComponent(doc['subject']) + '?size', function (error, response, body) {
 					var r2d=0;
 					if (!error && response.statusCode == 200) {
 						r2d=JSON.parse(body).size;
 						previous=doc["subject"];
 						prevSize=r2d;
-						var newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": r2d};
+						var newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": r2d, "length": 1.0/litvalue.length };
 						docs.push(newdoc);
 						pendingRequests--;
 						if ((++c) % bulksize==0){
