@@ -8,7 +8,7 @@ filename="md5test.data"
 while read -r downloadLink ext timex tr sr; do
 	echo "$downloadLink"
 	if [[ $downloadLink == [$searchFor]* ]] ; then
-		fn="/scratch/lodlaundromat/crawls/12/$downloadLink/clean.$ext.gz"
+		fn="/ssd/lodlab/crawls/12/$downloadLink/clean.$ext.gz"
 		echo $fn
 		if [ -e $fn ]
 		then

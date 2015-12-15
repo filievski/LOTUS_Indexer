@@ -49,12 +49,21 @@ curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus1
 			  "index":    "not_analyzed"      
 			},
 			"timestamp" : {
-				"type": "integer"
+				"type": "float"
       			},
+			"sr": {
+				"type": "float"
+			},
+                        "tr": {
+                                "type": "float"
+                        },
+			"length": {
+				"type": "float"
+			},
 			"r2d": {
 				"type": "integer"
-			},
-			"length": {
+			}, 
+			"degree": {
 				"type": "float"
 			}
     		}
