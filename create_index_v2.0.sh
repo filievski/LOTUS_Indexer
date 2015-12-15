@@ -1,11 +1,11 @@
-curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus1 -d '{
+curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus -d '{
 "settings": {
     "transient" : {
         "indices.store.throttle.type" : "none" 
     },
     "bulk" : {
         "number_of_replicas" : 1,
-	"number_of_shards": 5,
+	"number_of_shards": 10,
         "refresh_interval": -1,
         "translog": {
             "flush_threshold_size": "4000mb"
@@ -16,7 +16,7 @@ curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus1
     },
     "index" : {
         "number_of_replicas" : 1,
-	"number_of_shards": 5,
+	"number_of_shards": 15,
         "refresh_interval": -1,
         "translog": {
             "flush_threshold_size": "4000mb"
@@ -27,7 +27,7 @@ curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus1
     }
     },
 "mappings": {
-    "lit1" : {
+    "lit" : {
                 "_all": {
                     "enabled":  false
             	},
@@ -49,11 +49,14 @@ curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus1
 			  "index":    "not_analyzed"      
 			},
 			"timestamp" : {
-				"type": "integer"
+				"type": "float"
       			},
-			"r2d": {
-				"type": "integer"
+			"sr": {
+				"type": "float"
 			},
+                        "tr": {
+                                "type": "float"
+                        },
 			"length": {
 				"type": "float"
 			}

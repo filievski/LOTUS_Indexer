@@ -3,17 +3,24 @@ searchFor="$1"
 if [ -z $1 ]; then
 	searchFor="."
 fi
-filename="md5_with_time.data"
-while read -r line; do
-	if [[ $line == [$searchFor]* ]] ; then
-		IFS=' ' read downloadLink ext timex <<< $line
-		fn="/ssd/lodlab/crawls/12/$downloadLink/clean.$ext.gz"
-		if [ -e $fn ]
+filename="md5test.data"
+while read -r downloadLink ext timex tr sr; do
+	if [[ $downloadLink == [$searchFor]* ]] ; then
+		echo $downloadLink
+		echo $timex
+		if [[ timex != "0" ]]
 		then
-			zcat $fn | grep '"' | nodejs --max_old_space_size=8000000 lotus_v1.3.js $timex
-			echo $line >> "done.txt"
-		else
-			echo $line >> "notexist.txt"
+			fn="/scratch/lodlaundromat/crawls/12/$downloadLink/clean.$ext.gz"
+			echo $fn
+			if [ -e $fn ]
+			then
+				echo "exist"
+				zcat $fn | grep '"' | nodejs --max_old_space_size=8192 lotus_v1.3.js $timex
+				echo $downloadLink >> "done.txt"
+				exit
+			else
+				echo $downloadLink >> "notexist.txt"
+			fi
 		fi
 	fi
 done < "$filename"

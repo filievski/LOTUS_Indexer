@@ -44,8 +44,8 @@ var config = {
 es = elasticsearch(config);
 
 var options = {
-  _index : 'lotus',
-  _type : 'lit',
+  _index : 'lotus1',
+  _type : 'lit1',
   refresh: false,
   timeout: 900000
 }
@@ -107,6 +107,10 @@ parser.parse(stream, function(){
                                 if ((++c) % bulksize==0){
                                         s++;
                                         processBulk(null);
+                                } else if (pendingRequests==0 && finished){
+                                        processBulk(function(){
+                                                logToFiles(docs.length);
+                                        });
                                 }
 			} else if (doc['subject'].indexOf(blankNodePrefix)>=0){
 				prevSize=1;
@@ -116,11 +120,17 @@ parser.parse(stream, function(){
                                 if ((++c) % bulksize==0){
                                         s++;
                                         processBulk(null);
+                                }  else if (pendingRequests==0 && finished){
+                                        processBulk(function(){
+                                                logToFiles(docs.length);
+                                        });
                                 }
 			} else {
 				pendingRequests++;
-				request('http://localhost:7007/r2d/' + encodeURIComponent(doc['subject']) + '?size', function (error, response, body) {
+				request('http://index.lodlaundromat.org/r2d/' + encodeURIComponent(doc['subject']) + '?size', function (error, response, body) {
 					var r2d=0;
+					console.log(error);
+					console.log(response.statusCode);
 					if (!error && response.statusCode == 200) {
 						r2d=JSON.parse(body).size;
 						previous=doc["subject"];
@@ -135,6 +145,10 @@ parser.parse(stream, function(){
 							if (pendingRequests==0 && finished){
 								processBulk(function(){
 									logToFiles(remaining);
+								});
+							}  else if (pendingRequests==0 && finished){
+								processBulk(function(){
+									logToFiles(docs.length);
 								});
 							}
 						}
