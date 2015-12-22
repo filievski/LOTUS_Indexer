@@ -10,7 +10,6 @@ var url=require('url');
 var stream = byline.createStream(process.stdin);
 var docs=[];
 var bulksize = 50000;
-var configurationFile = 'config.json';
 var category = require('unicode-7.0.0/categories');
 
 var isNLS = function(s1){

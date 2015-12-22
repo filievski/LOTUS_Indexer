@@ -1,8 +1,13 @@
 #! /bin/bash
-x=/scratch/lodlaundromat/crawls/12/827d21acc04323962e99aa3dda744337/clean.nt.gz
-if [ -e $x ]
-then
-       zcat $x | grep '"' | nodejs --max_old_space_size=8192 lotus_v1.3.js 10000
-else
-        echo "no no"
-fi
+fn="test.txt"
+s=0
+while read -r md5; do
+	x="/scratch/lodlab/crawls/12/$md5/clean.nt.gz"
+	if [ -e $x ]
+	then
+		echo "$x"
+		c=`zcat $x | grep '"' | wc -l`
+		echo "$c"
+	fi
+done < "$fn"
+print "$s"
