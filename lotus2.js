@@ -30,7 +30,7 @@ var config = {
   server : {
     host : 'lotus.lucy.surfsara.nl',
     port: 443,
-    auth: "lotus:hsJh1v2F",
+    auth: "",
     secure: true
   }
 };

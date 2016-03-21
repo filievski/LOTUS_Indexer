@@ -31,7 +31,7 @@ var config = {
   server : {
     host : 'lotus.lucy.surfsara.nl',
     port: 443,
-    auth: "lotus:hsJh1v2F",
+    auth: "",
     secure: true
   }
 };
@@ -39,8 +39,8 @@ var config = {
 es = elasticsearch(config);
 
 var options = {
-  _index : 'lotus2',
-  _type : 'lit2',
+  _index : 'lotus1',
+  _type : 'lit1',
   refresh: false,
   timeout: 900000
 }
@@ -56,7 +56,10 @@ var semrichness=+ process.argv[5];
 var processBulk = function(callback) {
 	temp=docs;
 	docs=[];
+	var startES = +new Date();
 	es.bulkIndex(options, temp, function (err, data) {
+		var endES = +new Date();
+		es_time+=endES-startES;
 		if (!err || !err["errors"]){
 			if (callback)
 				callback();
@@ -68,7 +71,7 @@ var processBulk = function(callback) {
 }
 
 var logToFiles = function(r) {
-	fs.appendFile('logs.txt', (s*bulksize+r).toString() + "\t" + c.toString() + "\n", function (err){
+	fs.appendFile('logs.txt', docid + "\t" + (s*bulksize+r).toString() + "\t" + c.toString() + "\t" + es_time.toString() + "\t" + rocks_time.toString() +  "\n", function (err){
 	});
 }
 
@@ -82,6 +85,8 @@ var paused=false;
 var blankNodePrefix="http://lodlaundromat.org/.well-known/genid/";
 var minRequests=10;
 var maxRequests=20;
+var es_time=0;
+var rocks_time=0;
 parser.parse(stream, function(){
 	if (arguments['1']) {
 		var doc = arguments['1'];
@@ -96,22 +101,23 @@ parser.parse(stream, function(){
 			// The api calls and indexing start here
 			pendingRequests++;
 			if (!paused && pendingRequests>maxRequests) { stream.pause(); paused=true; }
+			startRocks = +new Date();
 			request('http://index.lodlab.lod.labs.vu.nl/get/degrees/?key=' + encodeURIComponent('<' + doc['subject'] + '>') + '_indegree', function (errorin, responsein, bodyin) {
 				request('http://index.lodlab.lod.labs.vu.nl/get/degrees/?key=' + encodeURIComponent('<' + doc['subject'] + '>') + '_outdegree', function (errorout, responseout, bodyout) {
 					if (doc['subject'].indexOf(blankNodePrefix)>=0){
 //					if (true) {
+						endRocks = +new Date();
+						rocks_time+=endRocks-startRocks;
 						if (!errorin && !errorout) { // && response.statusCode == 200) {
-                                                        var indegree = + bodyin;
-                                                        var outdegree = + bodyout;
-							newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": 1, "degree": indegree+outdegree, "length": 1.0/litvalue.length };
+                                                        var indegree = + bodyin || 0;
+                                                        var outdegree = + bodyout || 0;
+							newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": 1, "degree": indegree+outdegree, "length": 1.0/litvalue.length, "docid": docid };
 							docs.push(newdoc);
 							pendingRequests--;
 							if ((++c) % bulksize==0){
-                                                                console.log("stored " + c.toString());
 								s++;
 								processBulk(null);
 							}  else if (pendingRequests==0 && finished){
-                                                                console.log("Done");
 								processBulk(function(){
 									logToFiles(docs.length);
 								});
@@ -121,7 +127,6 @@ parser.parse(stream, function(){
                                                         logError(error + " " + errorin + " " + errorout + " " + doc['subject'] + '\n');
 							pendingRequests--;
 							if (pendingRequests==0 && finished){
-                                                                console.log("Done");
                                                                 processBulk(function(){
                                                                         logToFiles(docs.length);
                                                                 });
@@ -130,15 +135,16 @@ parser.parse(stream, function(){
 						}
 					} else {
  						request('http://index.lodlab.lod.labs.vu.nl/r2d/' + encodeURIComponent(doc['subject']) + '?size', function (error, response, body) {
+							endRocks = +new Date();
+							rocks_time+=endRocks-startRocks;
 							if (!error && !errorin && !errorout) { // && response.statusCode == 200) {
-								var r2d= + body;
-								var indegree = + bodyin;
-								var outdegree = + bodyout;
-								var newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": r2d, "degree": indegree+outdegree, "length": 1.0/litvalue.length };
+								var r2d= + body || 0;
+								var indegree = + bodyin || 0;
+								var outdegree = + bodyout || 0;
+								var newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "timestamp": timex, "r2d": r2d, "degree": indegree+outdegree, "length": 1.0/litvalue.length, "docid": docid };
 								docs.push(newdoc);
 								pendingRequests--;
 								if ((++c) % bulksize==0){
-									console.log("stored " + c.toString());
 									s++;
 									processBulk(null);
 								}  else if (pendingRequests==0 && finished){
