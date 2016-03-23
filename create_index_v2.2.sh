@@ -1,4 +1,4 @@
-curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus1 -d '{
+curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus22 -d '{
 "settings": {
     "transient" : {
         "indices.store.throttle.type" : "none" 
@@ -27,18 +27,18 @@ curl -u lotus:$(cat .password-file) -X PUT https://lotus.lucy.surfsara.nl/lotus1
     }
     },
 "mappings": {
-    "lit1" : {
+    "lit22" : {
                 "_all": {
                     "enabled":  false
             	},
 	      "properties" : {
 		        "subject" : {
 			  "type" :    "string",
-			  "index":    "no"      
+			  "index":    "analyzed"      
 			},
                         "predicate" : {
                           "type" :    "string",
-                          "index":    "no"      
+                          "index":    "analyzed"      
                         },
                         "string" : {
                           "type" :    "string",

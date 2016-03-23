@@ -11,7 +11,7 @@ var stream = byline.createStream(process.stdin);
 var docs=[];
 var bulksize = 50000;
 var category = require('unicode-7.0.0/categories');
-
+var cld=require('cld');
 
 var isNLS = function(s1){
         var consecutive=0
@@ -45,8 +45,8 @@ var config = {
 es = elasticsearch(config);
 
 var options = {
-  _index : 'lotus',
-  _type : 'lit',
+  _index : 'lotus22',
+  _type : 'lit22',
   refresh: false,
   timeout: 900000
 }
@@ -59,6 +59,8 @@ var docid= process.argv[2];
 var timex=+ process.argv[3];
 var termrichness=+ process.argv[4];
 var semrichness=+ process.argv[5];
+var degree=1;
+var r2d=1;
 
 var processBulk = function(callback) {
 	temp=docs;
@@ -92,13 +94,30 @@ parser.parse(stream, function(){
 		var datatype = N3Util.getLiteralType(docobj);
 		if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(litvalue)){
 			var langtag=N3Util.getLiteralLanguage(docobj);
-			if (langtag=="") langtag="any"; 
-			else langtag=langtag.substring(0,2).toLowerCase();
-			var newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": langtag, "docid": docid, "timestamp": timex, "tr": termrichness, "sr": semrichness, "length": 1.0/litvalue.length};
-			docs.push(newdoc);
-			if ((++c) % bulksize==0){
-				s++;
-				processBulk(null);
+			if (langtag=="") 
+			{
+				cld.detect(litvalue, function(err, result) {
+					var newdoc={};
+					if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
+						newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": "a_" + result["languages"]["0"]["code"].substring(0,2).toLowerCase(), "docid": docid, "timestamp": timex, "tr": termrichness, "sr": semrichness, "length": 1.0/litvalue.length, "r2d": r2d, "degree": degree};
+					} else{
+						newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": "any", "docid": docid, "timestamp": timex, "tr": termrichness, "sr": semrichness, "length": 1.0/litvalue.length, "r2d": r2d, "degree": degree};
+					}
+					docs.push(newdoc);
+					if ((++c) % bulksize==0){
+						s++;
+						processBulk(null);
+					}
+				});
+			}
+			else {
+				langtag=langtag.substring(0,2).toLowerCase();
+				var newdoc={"subject": doc["subject"], "predicate": doc["predicate"], "string": litvalue, "langtag": "u_" + langtag, "docid": docid, "timestamp": timex, "tr": termrichness, "sr": semrichness, "length": 1.0/litvalue.length, "r2d": r2d, "degree": degree};
+				docs.push(newdoc);
+				if ((++c) % bulksize==0){
+					s++;
+					processBulk(null);
+				}
 			}
 		} else
 			nums++;

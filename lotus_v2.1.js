@@ -26,12 +26,18 @@ var isNLS = function(s1){
         }
 }
 
+var configurationFile = 'config.json';
+
+var configuration = JSON.parse(
+    fs.readFileSync(configurationFile)
+);
+
 var config = {
   // optional - when not supplied, defaults to the following:
   server : {
     host : 'lotus.lucy.surfsara.nl',
     port: 443,
-    auth: "",
+    auth: configuration.auth,
     secure: true
   }
 };
