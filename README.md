@@ -1,6 +1,8 @@
 # LOTUS: Linked Open Text Unleashed
 The indexing scripts of LOTUS, an award-winning full-text index to the LOD Laundromat, and the largest available LOD index today.
 
+This module was developed at VU University Amsterdam, as a collaboration between CLTL and the Knowledge Representation & Reasoning departments.
+
 ##How to Create LOTUS index (this procedure roughly stays the same, but until we clean the instructions, please get in touch if you are interested in creating your own LOTUS index)
 
 1. Install Elastic Search & start it as a daemon: ./bin/elasticsearch -d
